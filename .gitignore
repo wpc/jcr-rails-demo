@@ -1,0 +1,5 @@
+log/*
+tmp/*
+repository.xml
+repository/*
+*.log

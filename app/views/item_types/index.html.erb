@@ -1,0 +1,17 @@
+<h1>Listing item types</h1>
+
+<table>
+  <tr>
+  </tr>
+<% @types.each do |type| %>
+  <tr>
+    <td><%=h type.name %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<p>
+  <%= link_to "New Item type", :action => 'new' %>
+</p>

@@ -3,3 +3,4 @@ tmp/*
 repository.xml
 repository/*
 *.log
+db/repository

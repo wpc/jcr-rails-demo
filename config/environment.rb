@@ -38,13 +38,19 @@ Rails::Initializer.run do |config|
   # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
+
+  if RUBY_PLATFORM == 'java'
+    require 'java'
+    require 'jackrabbit-standalone-1.6.0'
+    require 'jcr_repository'
   
-  require 'java'
-  require 'jackrabbit-standalone-1.6.0'
-  require 'jcr_repository'
+    JCR::Repository.ns = "jargon"
+    config.middleware.use "JCRSessions"
+    
+    # java.lang.System.set_property("org.apache.jackrabbit.repository.conf", 'config/repository.xml')
+    # java.lang.System.set_property("org.apache.jackrabbit.repository.home", 'db/repository')
+
+  end
   
-  # java.lang.System.set_property("org.apache.jackrabbit.repository.conf", 'config/repository.xml')
-  # java.lang.System.set_property("org.apache.jackrabbit.repository.home", 'db/repository')
-  
-  config.middleware.use "JCRSessions"
+
 end

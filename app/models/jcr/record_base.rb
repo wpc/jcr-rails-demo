@@ -69,6 +69,13 @@ module JCR
       class_eval(method_definition, __FILE__, __LINE__)
     end
     
+    def self.search(search_exp)
+      repo.query(
+        repo.qf.send(:and,
+          repo.qf.descendant_node(class_root.path),
+          repo.qf.full_text_search(nil, search_exp)), self)
+    end
+    
     attr_accessor :jcr_node
 
     def initialize(attributes={})
@@ -140,6 +147,14 @@ module JCR
     
     def ==(another)
       self.jcr_node && another.jcr_node && self.jcr_node.path == another.jcr_node.path
+    end
+    
+    def eql?(another)
+      self == another
+    end
+    
+    def hash
+      (jcr_node && jcr_node.path).hash
     end
   end
 end

@@ -55,4 +55,16 @@ class ItemTest < ActiveSupport::TestCase
     i.save
     assert_equal 11333, Item.find('1').attr_long
   end
+  
+  def test_full_text_search
+    i1 = Item.create(:identifier => '1', :name => 'hello')
+    i2 = Item.create(:identifier => '2', :name => 'world')
+    
+    assert_equal 1, Item.search("world").size
+    assert_equal [i2], Item.search("world").to_a
+    
+    assert_equal [i1, i2], Item.search("hello OR world").to_a
+    
+  end
+  
 end

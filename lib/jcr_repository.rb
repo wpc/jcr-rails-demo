@@ -1,4 +1,28 @@
 module JCR
+  class QueryResult
+    include Enumerable
+    
+    def initialize(resultset, model_class)
+      @resultset = resultset
+      @model_class = model_class
+    end
+    
+    def size
+      to_a.size
+    end
+    
+    def to_a
+      super.uniq
+    end
+    
+    def each(&block)
+      @resultset.nodes.each do |n|
+        yield @model_class.create_from_jcr_node(n)
+      end
+    end
+    
+  end
+  
   module Repository
     include_class javax.jcr.Repository
     include_class javax.jcr.Session
@@ -60,11 +84,6 @@ module JCR
       jcr_session.root_node
     end
     
-    def clear
-      approot.remove
-      save
-    end
-    
     def self.save
       jcr_session.save
     end
@@ -75,7 +94,17 @@ module JCR
     
     def self.reset
       approot.remove
-      jcr_session.save
+      save
     end
+    
+    def self.qf
+      jcr_session.workspace.query_manager.getQOMFactory()
+    end
+    
+    def self.query(constrain, model_class)
+      q = qf.create_query(qf.selector("nt:base"), constrain, nil, nil)
+      QueryResult.new(q.execute, model_class)
+    end
+    
   end
 end

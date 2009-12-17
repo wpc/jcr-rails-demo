@@ -26,11 +26,18 @@ class ItemTest < ActiveSupport::TestCase
   end
   
   def test_attribute_methods
-    i = Item.create(:identifier => '1')
+    i = Item.new(:identifier => '1')
     assert_equal nil, i.name
     i.name = "hello"
     i.save
     assert_equal 'hello', Item.find('1').name
+  end
+  
+  def test_update_attributes
+    i = Item.create(:identifier => '1')
+    i.update_attributes(:name => 'hello world')
+    assert_equal 'hello world', i.name
+    assert_equal 'hello world', Item.find('1').name
   end
 
   

@@ -2,6 +2,11 @@
 
 <% form_for(@item) do |f| %>
   <%= f.error_messages %>
+  
+  <p>
+    name: <%= f.text_field 'name' %>
+  </p>
+  
   <p>
     <%= f.submit 'Update' %>
   </p>

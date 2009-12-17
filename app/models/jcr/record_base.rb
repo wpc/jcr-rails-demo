@@ -81,7 +81,8 @@ module JCR
       if @attributes.has_key?(name)
         return @attributes[name]
       end
-
+      
+      return if new_record?
       begin
         jcr_node.get_property(name.to_s).string
       rescue self.class.repo.path_not_found_exception
@@ -108,6 +109,13 @@ module JCR
     
     def to_param  # make resource routing happy
       identifier
+    end
+    
+    def update_attributes(attrs)
+      attrs.each do |key, value|
+        write_attribute(key, value)
+      end
+      save
     end
     
     def save

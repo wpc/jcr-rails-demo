@@ -47,10 +47,12 @@ module JCR
     
     def self.property(name, type=:string)
       property_definitions[name] = type
+      evaluate_attribute_method "def #{name}; read_attribute('#{name}'); end"
+      evaluate_attribute_method "def #{name}=(new_value);write_attribute('#{name}', new_value);end"
     end
     
     def self.property_definitions
-      @property_definitions ||= {}
+      @property_definitions ||= {}.with_indifferent_access
     end
     
     def self.create(attributes={})
@@ -59,11 +61,16 @@ module JCR
       record
     end
     
+    # Evaluate the definition for an attribute related method
+    def self.evaluate_attribute_method(method_definition)
+      class_eval(method_definition, __FILE__, __LINE__)
+    end
+    
     attr_accessor :jcr_node
 
     def initialize(attributes={})
       attributes ||= {}
-      @attributes = attributes.clone
+      @attributes = attributes.with_indifferent_access
     end
     
     def write_attribute(name, value)
@@ -110,7 +117,7 @@ module JCR
       else
         self.class.update_node(jcr_node, @attributes)
       end
-      @attributes = {}
+      @attributes = {}.with_indifferent_access
       true
     end
     

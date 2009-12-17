@@ -24,6 +24,14 @@ class ItemTest < ActiveSupport::TestCase
     i.save
     assert_equal 'hello', Item.find('1').read_attribute(:name)
   end
+  
+  def test_attribute_methods
+    i = Item.create(:identifier => '1')
+    assert_equal nil, i.name
+    i.name = "hello"
+    i.save
+    assert_equal 'hello', Item.find('1').name
+  end
 
   
 end

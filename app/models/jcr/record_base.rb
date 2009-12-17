@@ -38,7 +38,11 @@ module JCR
     end
     
     def self.class_root
-      repo.find_or_create_node(self.name)
+      repo.find_or_create_node(class_root_name)
+    end
+    
+    def self.class_root_name
+      self.name.underscore.pluralize
     end
     
     def self.property(name, type=:string)

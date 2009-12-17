@@ -39,6 +39,20 @@ class ItemTest < ActiveSupport::TestCase
     assert_equal 'hello world', i.name
     assert_equal 'hello world', Item.find('1').name
   end
-
   
+  
+  def test_boolean_attribute
+    i = Item.new(:identifier => '1')
+    i.attr_bool = true
+    i.save
+    assert_equal true, Item.find('1').attr_bool
+    assert_equal true, Item.find('1').attr_bool?
+  end
+  
+  def test_long_attribute
+    i = Item.new(:identifier => '1')
+    i.attr_long = 11333
+    i.save
+    assert_equal 11333, Item.find('1').attr_long
+  end
 end

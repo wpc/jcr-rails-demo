@@ -49,6 +49,9 @@ module JCR
       property_definitions[name] = type
       evaluate_attribute_method "def #{name}; read_attribute('#{name}'); end"
       evaluate_attribute_method "def #{name}=(new_value);write_attribute('#{name}', new_value);end"
+      if type == :boolean
+        evaluate_attribute_method "def #{name}?; read_attribute('#{name}'); end"
+      end
     end
     
     def self.property_definitions
@@ -83,8 +86,9 @@ module JCR
       end
       
       return if new_record?
+      type = self.class.property_definitions[name]
       begin
-        jcr_node.get_property(name.to_s).string
+        jcr_node.get_property(name.to_s).send(type)
       rescue self.class.repo.path_not_found_exception
         nil
       end

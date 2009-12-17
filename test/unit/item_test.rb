@@ -11,21 +11,19 @@ class ItemTest < ActiveSupport::TestCase
     assert_equal 'hello', item.identifier
     assert_equal item, Item.find('hello')
   end
-    # 
-    # def test_set_property
-    #   i = Item.create
-    #   assert_equal nil, i.attribute(:name)
-    #   assert_equal nil, Item.find(i.identifier).attribute(:name)
-    #   
-    #   i.set_attribute(:name, 'hello')
-    #   assert_equal 'hello', i.attribute(:name)
-    # 
-    #   i.save
-    #   assert_equal 'hello', Item.find(i.id).attribute(:name)
-    # end
-    # 
-    # def test_update_attribute
-    #   i = Item.create(:name)
-    # end
+
+  def test_read_write_attribute
+    i = Item.create(:identifier => '1')
+    assert_equal nil, i.read_attribute(:name)
+    assert_equal nil, Item.find('1').read_attribute(:name)
+    
+    i.write_attribute(:name, 'hello')
+    assert_equal 'hello', i.read_attribute(:name)
+    
+    assert_equal nil, Item.find('1').read_attribute(:name)
+    i.save
+    assert_equal 'hello', Item.find('1').read_attribute(:name)
+  end
+
   
 end

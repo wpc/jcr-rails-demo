@@ -66,11 +66,11 @@ module JCR
       @attributes = attributes.clone
     end
     
-    def set_attribute(name, value)
+    def write_attribute(name, value)
       @attributes[name] = value
     end
     
-    def attribute(name)
+    def read_attribute(name)
       if @attributes.has_key?(name)
         return @attributes[name]
       end

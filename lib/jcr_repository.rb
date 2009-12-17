@@ -72,5 +72,10 @@ module JCR
     def self.path_not_found_exception
       PathNotFoundException
     end
+    
+    def self.reset
+      approot.remove
+      jcr_session.save
+    end
   end
 end

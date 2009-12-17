@@ -11,13 +11,12 @@ module JCR
       returning(self.new) { |record| record.jcr_node = node }
     end
     
-    def self.find(id)
-      create_from_jcr_node(class_root.get_node(jcr_name(id)))
+    def self.find(identifier)
+      create_from_jcr_node(class_root.get_node(identifier))
     end
     
-    def self.add_node(attributes)
-      id = generate_id
-      jcr_node = class_root.add_node(jcr_name(id))
+    def self.add_node(identifier, attributes={})
+      jcr_node = class_root.add_node(identifier)
       update_node(jcr_node, attributes)
     end
     
@@ -34,27 +33,12 @@ module JCR
       repo.save
     end
     
-    def self.jcr_name(id)
-      "i#{id}"
-    end
-    
     def self.repo
       JCR::Repository
     end
     
     def self.class_root
       repo.find_or_create_node(self.name)
-    end
-    
-    # todo: need a safer sequence if used not as a toy
-    def self.generate_id
-      begin
-        last = class_root.get_property("sequence").get_long
-      rescue javax.jcr.PathNotFoundException
-        last = 0
-      end
-      class_root.set_property("sequence", last + 1)
-      last + 1
     end
     
     def self.property(name, type=:string)
@@ -86,7 +70,7 @@ module JCR
       if @attributes.has_key?(name)
         return @attributes[name]
       end
-      
+
       begin
         jcr_node.get_property(name.to_s).string
       rescue self.class.repo.path_not_found_exception
@@ -106,17 +90,19 @@ module JCR
       @jcr_node == nil
     end
     
-    def id
-      @jcr_node && @jcr_node.name.scan(/\d+/)[0].to_i
+    def identifier
+      return @attributes[:identifier] if @attributes.has_key?(:identifier)
+      @jcr_node && @jcr_node.name
     end
     
     def to_param  # make resource routing happy
-      (id = self.id) ? id.to_s : nil
+      identifier
     end
     
     def save
       if new_record?
-        self.jcr_node = self.class.add_node(@attributes)
+        raise 'you must give a identifier to the record' unless identifier
+        self.jcr_node = self.class.add_node(identifier, @attributes)
       else
         self.class.update_node(jcr_node, @attributes)
       end

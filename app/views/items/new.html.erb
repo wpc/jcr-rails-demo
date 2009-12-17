@@ -2,7 +2,9 @@
 
 <% form_for(@item) do |f| %>
   <%= f.error_messages %>
-
+  <p>
+    identifier: <%= f.text_field 'identifier' %>
+  </p>
   <p>
     <%= f.submit 'Create' %>
   </p>

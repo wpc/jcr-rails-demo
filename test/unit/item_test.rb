@@ -59,12 +59,33 @@ class ItemTest < ActiveSupport::TestCase
   def test_full_text_search
     i1 = Item.create(:identifier => '1', :name => 'hello')
     i2 = Item.create(:identifier => '2', :name => 'world')
-    
     assert_equal 1, Item.search("world").size
     assert_equal [i2], Item.search("world").to_a
-    
     assert_equal [i1, i2], Item.search("hello OR world").to_a
+  end
+  
+  def test_checkin_versioning
+    i = Item.create(:identifier => 'kim',:name => 'hello')
+    i.checkin
+    i.checkout
+    i.update_attributes(:name => 'world')
+    i.checkin
     
+    assert_equal 3, i.versions.size
+  end
+  
+  def test_restore_version
+    i = Item.create(:identifier => 'kim',:name => 'hello')
+    i.checkin
+    i.checkout
+    i.update_attributes(:name => 'world')
+    i.checkin
+    
+    i.restore(i.versions[1])
+    assert_equal 'hello', i.name
+    assert_equal 'hello', Item.find('kim').name
+
+    assert_equal 3, i.versions.size
   end
   
 end

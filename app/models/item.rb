@@ -1,5 +1,7 @@
 class Item < JCR::RecordBase
-  property :name
-  property :attr_bool, :boolean
-  property :attr_long, :long
+  versionable
+  
+  has_property :name
+  has_property :attr_bool, :boolean
+  has_property :attr_long, :long
 end

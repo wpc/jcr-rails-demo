@@ -17,6 +17,7 @@ module JCR
     
     def self.add_node(identifier, attributes={})
       jcr_node = class_root.add_node(identifier)
+      jcr_node.add_mixin("mix:versionable") if @versionable
       update_node(jcr_node, attributes)
     end
     
@@ -45,13 +46,17 @@ module JCR
       self.name.underscore.pluralize
     end
     
-    def self.property(name, type=:string)
+    def self.has_property(name, type=:string)
       property_definitions[name] = type
       evaluate_attribute_method "def #{name}; read_attribute('#{name}'); end"
       evaluate_attribute_method "def #{name}=(new_value);write_attribute('#{name}', new_value);end"
       if type == :boolean
         evaluate_attribute_method "def #{name}?; read_attribute('#{name}'); end"
       end
+    end
+    
+    def self.versionable
+      @versionable = true
     end
     
     def self.property_definitions
@@ -155,6 +160,25 @@ module JCR
     
     def hash
       (jcr_node && jcr_node.path).hash
+    end
+    
+    def checkin
+      raise 'need save a node first before checkin' unless jcr_node
+      jcr_node.checkin
+    end
+    
+    def checkout
+      raise 'need save a node first before checkout' unless jcr_node
+      jcr_node.checkout
+    end
+    
+    def restore(version)
+      jcr_node.restore(version, true)
+      
+    end
+    
+    def versions
+      jcr_node.version_history.all_versions.to_a
     end
   end
 end

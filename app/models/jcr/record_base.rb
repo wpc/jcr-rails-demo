@@ -21,6 +21,15 @@ module JCR
       update_node(jcr_node, attributes)
     end
     
+    def self.add_child(parent_node, attributes)
+      attributes =  attributes.with_indifferent_access
+      identifier = attributes[:identifier]
+      raise 'must give identifier field' unless identifier
+      
+      child_node = parent_node.add_node(identifier)
+      update_node(child_node, attributes)
+    end
+    
     def self.update_node(jcr_node, attributes)
       attributes.each do |key, value|
         jcr_node.set_property(key.to_s, value)
@@ -78,7 +87,7 @@ module JCR
       repo.query(
         repo.qf.send(:and,
           repo.qf.descendant_node(class_root.path),
-          repo.qf.full_text_search(nil, search_exp)), self)
+          repo.qf.full_text_search('name', search_exp)), self)
     end
     
     attr_accessor :jcr_node
@@ -174,11 +183,20 @@ module JCR
     
     def restore(version)
       jcr_node.restore(version, true)
-      
     end
     
     def versions
       jcr_node.version_history.all_versions.to_a
+    end
+    
+    def add_child(attributes)
+      self.class.create_from_jcr_node(self.class.add_child(jcr_node, attributes))
+    end
+    
+    def children
+      jcr_node.nodes.collect do |n|
+        self.class.create_from_jcr_node(n)
+      end
     end
   end
 end

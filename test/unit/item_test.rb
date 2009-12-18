@@ -88,4 +88,29 @@ class ItemTest < ActiveSupport::TestCase
     assert_equal 3, i.versions.size
   end
   
+  def test_hierarhy
+    post = Item.create(:identifier => 'post1')
+
+    post.add_child :identifier => 'comment1'
+    post.add_child :identifier => 'comment2'
+    post.add_child :identifier => 'comment3'
+
+
+    assert_equal 3, post.children.size
+    assert_equal ['comment1', 'comment2', 'comment3'], Item.find('post1').children.collect(&:identifier)
+  end
+  
+  def test_find_hiearchy
+    book = Item.create(:identifier => 'book')
+
+    c1 = book.add_child :identifier => 'chapter1'
+    c2 = book.add_child :identifier => 'chapter2'
+    c3 = book.add_child :identifier => 'chapter3'
+    p1 = c1.add_child :identifier => 'paragraph1'
+    p2 = c1.add_child :identifier => 'paragraph2'
+    
+    assert_equal c2, Item.find("book/chapter2")
+    assert_equal p1, Item.find("book/chapter1/paragraph1")
+  end
+  
 end
